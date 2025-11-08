@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pyplot Graph Generator</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        textarea { width: 80%; min-height: 200px; font-family: monospace; margin-bottom: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #image-container { margin-top: 20px; border: 1px solid #ccc; padding: 10px; min-height: 100px; }
+        #error-message { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Pyplot Code Generator</h1>
+    <p>Enter Python code using 'plt' and 'np' to generate a graph.</p>
+    
+    <textarea id="code-input">
+# Sample code:
+x = np.linspace(0, 2 * np.pi, 400)
+y = np.sin(x ** 2)
+
+plt.figure(figsize=(8, 6))
+plt.plot(x, y)
+plt.title("A Plot of sin(x^2)")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+    </textarea>
+    
+    <button id="generate-btn">Generate Graph</button>
+    
+    <h3>Result:</h3>
+    <div id="image-container">
+        <img id="graph-image" src="" alt="Generated graph will appear here">
+    </div>
+    <p id="error-message"></p>
+
+    <script>
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const code = document.getElementById('code-input').value;
+            const imageElement = document.getElementById('graph-image');
+            const errorElement = document.getElementById('error-message');
+
+            // Clear previous results
+            imageElement.src = '';
+            errorElement.textContent = '';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/generate-graph/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: code }),
+                });
+
+                if (!response.ok) {
+                    // If the server returned an error (like 400), show it
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'An unknown error occurred.');
+                }
+                
+                // The response is a binary image (a "blob")
+                const imageBlob = await response.blob();
+                
+                // Create a temporary URL for the blob and set it as the image source
+                const imageUrl = URL.createObjectURL(imageBlob);
+                imageElement.src = imageUrl;
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorElement.textContent = `Failed to generate graph: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
