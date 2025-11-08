@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 from langchain_core.messages import AIMessage, ToolMessage
@@ -38,13 +39,20 @@ class AgentChatHandler:
                     else:
                         LOGGER.error(f"Unexpected mode: {mode}")
                 if isinstance(last_message[-1], AIMessage):
-                    if isinstance(last_message[-2], ToolMessage):
+                    for _ in range(3):
+                        index = 0
                         try:
-                            await self.websocket.send_json({'image': last_message[-2].content})
-                        except Exception as ex:
+                            if isinstance(last_message[-(index + 2)], ToolMessage):
+                                res = json.loads(last_message[-2].content)
+                                if 'image' in res:
+                                    await self.websocket.send_json(res)
+                                    break
+                        except Exception:
                             pass
-
+                        finally:
+                            index += 1
                     return BotResponse(text=last_message[-1].content)
         except Exception as ex:
+
             LOGGER.error(f"Error in AgentChatHandler: {ex}")
             raise GeneralAgentException(ex)

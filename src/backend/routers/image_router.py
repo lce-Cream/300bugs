@@ -30,7 +30,7 @@ async def generate_diagram(payload: PyplotCode):
         image_buffer.seek(0)
         img_bytes = image_buffer.getvalue()
         img_b64 = base64.b64encode(img_bytes).decode("utf-8")
-        return img_b64
+        return {"image": img_b64}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error executing code: {e}")
     finally:

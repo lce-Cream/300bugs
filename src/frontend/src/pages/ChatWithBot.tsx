@@ -9,6 +9,7 @@ type ChatMessage = {
   sender: 'user' | 'bot';
   text?: string; // plain text
   markdown?: string; // markdown content from backend
+  image?: string; // base64 image string
   sessionId?: string;
 };
 
@@ -37,6 +38,24 @@ const ChatWithBot: React.FC = () => {
       // 3) { content: '...', role: 'assistant' }
 
       if (parsed === null) return;
+
+      // If image key is present, treat as base64 image
+      if (parsed.image) {
+        // Try to auto-detect MIME type from base64 header
+        let mime = 'image/png';
+        if (parsed.image.startsWith('/9j/')) mime = 'image/jpeg';
+        if (parsed.image.startsWith('R0lGOD')) mime = 'image/gif';
+        setMessages((prev) => [...prev, {
+          sender: parsed.sender === 'user' ? 'user' : 'bot',
+          image: parsed.image,
+          sessionId: parsed.sessionId,
+          // @ts-ignore
+          mime,
+        }]);
+        // Debug log
+        console.log('Received image base64:', parsed.image.slice(0, 40), '...');
+        return;
+      }
 
       // Prefer explicit markdown field
       if (parsed.markdown) {
@@ -105,11 +124,16 @@ const ChatWithBot: React.FC = () => {
           >
             <span className="chat-sender">{msg.sender === 'user' ? 'You' : 'Bot'}:</span>
             <div style={{ marginTop: 6 }}>
-              {msg.markdown ? (
+              {msg.image ? (
+                <img
+                  src={`data:image/png;base64,${msg.image}`}
+                  // alt="chat image"
+                  // style={{maxWidth:'300px',borderRadius:8}}
+                />
+              ) : msg.markdown ? (
                 <Markdown>{msg.markdown}</Markdown>
               ) : (
                 <Markdown>{msg.text}</Markdown>
-                // <span>{msg.text}</span>
               )}
             </div>
           </div>
