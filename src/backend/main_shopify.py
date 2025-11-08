@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi_mcp import FastApiMCP
 from starlette.middleware.cors import CORSMiddleware
 
+from routers.cosmos_router import supplier_router
 from routers.image_router import image_router
 from routers.shopify_router import shopify_router
 
@@ -21,6 +22,7 @@ app.add_middleware(
 
 app.include_router(shopify_router, prefix="/shopify", tags=["shopify"])
 app.include_router(image_router)
+app.include_router(supplier_router, prefix="/suppliers", tags=["suppliers"])
 
 mcp = FastApiMCP(app)
 

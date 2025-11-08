@@ -1,5 +1,5 @@
-import os
 import ast
+import os
 from typing import List
 
 from dotenv import load_dotenv
@@ -26,7 +26,16 @@ class MCPConfig(BaseModel):
 class N8NConfig(BaseModel):
     url: List[str] = ast.literal_eval(os.getenv('N8N_URL', '[]'))
 
+
+class AzureCosmosDBConfig(BaseModel):
+    uri: str = os.getenv('AZURE_COSMOS_DB_URI')
+    key: str = os.getenv('AZURE_COSMOS_DB_KEY')
+    database_name: str = os.getenv('AZURE_COSMOS_DB_DATABASE_NAME')
+    supplier_container_name: str = os.getenv('AZURE_COSMOS_SUPPLIER_CONTAINER_NAME')
+
+
 APP_CONFIG = AppConfig()
 AZURE_OPENAI_CONFIG = AzureOpenAIConfig()
 MCP_CONFIG = MCPConfig()
 N8N_CONFIG = N8NConfig()
+AZURE_COSMOS_DB_CONFIG = AzureCosmosDBConfig()

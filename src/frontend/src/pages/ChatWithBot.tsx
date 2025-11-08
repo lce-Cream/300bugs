@@ -117,29 +117,47 @@ const ChatWithBot: React.FC = () => {
   return (
     <div className="page-container">
       <h2>Chat with Bot</h2>
-      <div className="chat-box">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={msg.sender === 'user' ? 'chat-message user-message' : 'chat-message bot-message'}
-          >
-            <span className="chat-sender">{msg.sender === 'user' ? 'You' : 'Bot'}:</span>
-            <div style={{ marginTop: 6 }}>
-              {msg.image ? (
-                <img
-                  src={`data:${(msg as any).mime || 'image/png'};base64,${msg.image}`}
-                  alt="chat image"
-                  style={{maxWidth:'300px',borderRadius:8,cursor:'pointer'}}
-                  onClick={() => setExpandedImage({src: `data:${(msg as any).mime || 'image/png'};base64,${msg.image}`, mime: (msg as any).mime || 'image/png'})}
-                />
-              ) : msg.markdown ? (
-                <Markdown>{msg.markdown}</Markdown>
-              ) : (
-                <Markdown>{msg.text}</Markdown>
-              )}
+      <div className="chat-box" style={{display:'flex',flexDirection:'column',gap:12}}>
+        {messages.map((msg, idx) => {
+          const isUser = msg.sender === 'user';
+          return (
+            <div
+              key={idx}
+              className={isUser ? 'chat-message user-message' : 'chat-message bot-message'}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: isUser ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <span className="chat-sender" style={{fontWeight:'bold',marginBottom:2}}>{isUser ? 'You' : 'Bot'}:</span>
+              <div style={{
+                marginTop: 6,
+                background: isUser ? '#e6f7ff' : '#f5f5f5',
+                color: '#222',
+                borderRadius: 8,
+                padding: '8px 12px',
+                maxWidth: '70%',
+                boxShadow: isUser ? '0 2px 8px #b3e5fc' : '0 2px 8px #eee',
+                wordBreak: 'break-word',
+                textAlign: 'left',
+              }}>
+                {msg.image ? (
+                  <img
+                    src={`data:${(msg as any).mime || 'image/png'};base64,${msg.image}`}
+                    alt="chat image"
+                    style={{maxWidth:'300px',borderRadius:8,cursor:'pointer'}}
+                    onClick={() => setExpandedImage({src: `data:${(msg as any).mime || 'image/png'};base64,${msg.image}`, mime: (msg as any).mime || 'image/png'})}
+                  />
+                ) : msg.markdown ? (
+                  <Markdown>{msg.markdown}</Markdown>
+                ) : (
+                  <Markdown>{msg.text}</Markdown>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div style={{ display: 'flex', gap: 8, width: '100%', marginTop: 12 }}>
         <input
