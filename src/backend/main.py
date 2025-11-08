@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from routers.chat_router import chat_router
 from routers.health_router import health_router
+from routers.items import items_router
 
 app = FastAPI()
 
@@ -18,3 +19,4 @@ app.add_middleware(
 
 app.include_router(chat_router)
 app.include_router(health_router, prefix="/health", tags=["health"])
+app.include_router(items_router)
