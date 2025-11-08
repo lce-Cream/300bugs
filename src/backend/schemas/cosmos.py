@@ -13,3 +13,7 @@ class SupplierProductSchema(BaseModel):
     currency: str
     current_stock: int
     reorder_point: int
+
+
+class CosmosQuerySchema(BaseModel):
+    query: str

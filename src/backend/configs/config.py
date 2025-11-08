@@ -32,6 +32,11 @@ class AzureCosmosDBConfig(BaseModel):
     key: str = os.getenv('AZURE_COSMOS_DB_KEY')
     database_name: str = os.getenv('AZURE_COSMOS_DB_DATABASE_NAME')
     supplier_container_name: str = os.getenv('AZURE_COSMOS_SUPPLIER_CONTAINER_NAME')
+    orders_container_name: str = os.getenv('AZURE_COSMOS_SUPPLIER_ORDERS_NAME')
+
+
+class PostgreSQLConfig(BaseModel):
+    jdbc_url: str = os.getenv('POSTGRES_JDBC')
 
 
 APP_CONFIG = AppConfig()
@@ -39,3 +44,4 @@ AZURE_OPENAI_CONFIG = AzureOpenAIConfig()
 MCP_CONFIG = MCPConfig()
 N8N_CONFIG = N8NConfig()
 AZURE_COSMOS_DB_CONFIG = AzureCosmosDBConfig()
+POSTGRESQL_CONFIG = PostgreSQLConfig()
