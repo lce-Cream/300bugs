@@ -1,6 +1,6 @@
 from typing import Optional
 
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, ToolMessage
 from starlette.websockets import WebSocket
 
 from agent.graph import GRAPH_MEMORY, MCP_SERVER_CLIENT, create_graph
@@ -38,6 +38,12 @@ class AgentChatHandler:
                     else:
                         LOGGER.error(f"Unexpected mode: {mode}")
                 if isinstance(last_message[-1], AIMessage):
+                    if isinstance(last_message[-2], ToolMessage):
+                        try:
+                            await self.websocket.send_json({'image': last_message[-2].content})
+                        except Exception as ex:
+                            pass
+
                     return BotResponse(text=last_message[-1].content)
         except Exception as ex:
             LOGGER.error(f"Error in AgentChatHandler: {ex}")
