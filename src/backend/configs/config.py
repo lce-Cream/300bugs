@@ -21,6 +21,10 @@ class MCPConfig(BaseModel):
     url: str = os.getenv('MCP_B8N_URL')
 
 
+class N8NConfig(BaseModel):
+    url: str = os.getenv('N8N_URL')
+
 APP_CONFIG = AppConfig()
 AZURE_OPENAI_CONFIG = AzureOpenAIConfig()
 MCP_CONFIG = MCPConfig()
+N8N_CONFIG = N8NConfig()

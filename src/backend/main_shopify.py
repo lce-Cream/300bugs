@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi_mcp import FastApiMCP
 from starlette.middleware.cors import CORSMiddleware
 
+from routers.shopify_router import shopify_router
+
 app = FastAPI()
 
 app.add_middleware(
@@ -16,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(gov_taxes_router, prefix="/shopify", tags=["gov"])
+app.include_router(shopify_router, prefix="/shopify", tags=["shopify"])
 
 mcp = FastApiMCP(app)
 
