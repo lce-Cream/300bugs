@@ -15,5 +15,5 @@ class SupplierProductSchema(BaseModel):
     reorder_point: int
 
 
-class CosmosQuerySchema(BaseModel):
+class PostgresSQLQuerySchema(BaseModel):
     query: str
