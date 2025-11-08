@@ -13,7 +13,7 @@ class AppConfig(BaseModel):
 class AzureOpenAIConfig(BaseModel):
     api_key: str = os.getenv('AZURE_OPENAI_API_KEY', '')
     endpoint: str = os.getenv('AZURE_OPENAI_ENDPOINT', '')
-    deployment_name: str = os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME', 'gpt-4.1-turbo')
+    deployment_name: str = os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME', 'gpt-4.1-nano')
     api_version: str = os.getenv('AZURE_OPENAI_API_VERSION', '2024-12-01-preview')
 
 

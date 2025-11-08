@@ -11,14 +11,14 @@ from langgraph.graph.message import AnyMessage, add_messages
 from langgraph.prebuilt import tools_condition, ToolNode
 from typing_extensions import TypedDict
 
-from agents.agent_config import AGENT_LLM
+from agent.agent_config import AGENT_LLM
 from prompts.chat_system_prompt import CHAT_SYSTEM_PROMPT
 
 GRAPH_MEMORY = MemorySaver()
 
 MCP_SERVER_CLIENT = MultiServerMCPClient(
     {
-        "gov": StreamableHttpConnection(url="http://localhost:8001/mcp", transport="streamable_http"),
+        "shopify": StreamableHttpConnection(url="http://localhost:8001/mcp", transport="streamable_http"),
     }
 )
 

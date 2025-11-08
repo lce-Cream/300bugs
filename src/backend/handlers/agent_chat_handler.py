@@ -3,10 +3,9 @@ from typing import Optional
 from langchain_core.messages import AIMessage
 from starlette.websockets import WebSocket
 
-from agents.graph import GRAPH_MEMORY, MCP_SERVER_CLIENT, create_graph
+from agent.graph import GRAPH_MEMORY, MCP_SERVER_CLIENT, create_graph
 from configs.logger import LOGGER
 from exceptions.agent_exceptions import GeneralAgentException
-
 from schemas.websocket import UserRequest, BotResponse
 
 
@@ -24,8 +23,8 @@ class AgentChatHandler:
         }
         last_message = None
         try:
-            async with MCP_SERVER_CLIENT.session("gov") as gov_session:
-                agent = await create_graph(gov_session)
+            async with MCP_SERVER_CLIENT.session("shopify") as shopify_session:
+                agent = await create_graph(shopify_session)
                 async for name, mode, chunk in agent.astream(
                         {"messages": self.user_request.text},
                         subgraphs=True,
