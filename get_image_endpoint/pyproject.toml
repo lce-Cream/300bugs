@@ -1,0 +1,11 @@
+[project]
+name = "get-image-endpoint"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.121.0",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "uvicorn>=0.38.0",
+]
