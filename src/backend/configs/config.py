@@ -1,4 +1,6 @@
 import os
+import ast
+from typing import List
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -22,7 +24,7 @@ class MCPConfig(BaseModel):
 
 
 class N8NConfig(BaseModel):
-    url: str = os.getenv('N8N_URL')
+    url: List[str] = ast.literal_eval(os.getenv('N8N_URL', '[]'))
 
 APP_CONFIG = AppConfig()
 AZURE_OPENAI_CONFIG = AzureOpenAIConfig()

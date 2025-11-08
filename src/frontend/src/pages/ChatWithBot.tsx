@@ -1,21 +1,81 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Markdown from 'marked-react';
 
 function generateSessionId() {
   return Math.random().toString(36).substr(2, 9) + Date.now();
 }
 
+type ChatMessage = {
+  sender: 'user' | 'bot';
+  text?: string; // plain text
+  markdown?: string; // markdown content from backend
+  sessionId?: string;
+};
+
 const ChatWithBot: React.FC = () => {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const ws = useRef<WebSocket | null>(null);
   const sessionId = useRef<string>(generateSessionId());
 
   useEffect(() => {
     ws.current = new WebSocket('ws://localhost:8000/ws/chat');
+
     ws.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setMessages((prev) => [...prev, data]);
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(event.data);
+      } catch (e) {
+        const md = String(event.data);
+        setMessages((prev) => [...prev, { sender: 'bot', markdown: md }]);
+        return;
+      }
+
+      // If parsed JSON, support several shapes:
+      // 1) { sender: 'bot'|'user', text: '...', markdown: '...' }
+      // 2) { type: 'markdown', content: '...' }
+      // 3) { content: '...', role: 'assistant' }
+
+      if (parsed === null) return;
+
+      // Prefer explicit markdown field
+      if (parsed.markdown) {
+        setMessages((prev) => [...prev, { sender: parsed.sender === 'user' ? 'user' : 'bot', markdown: parsed.markdown, sessionId: parsed.sessionId }]);
+        return;
+      }
+
+      // If the server uses a type/content shape
+      if (parsed.type === 'markdown' && parsed.content) {
+        setMessages((prev) => [...prev, { sender: 'bot', markdown: parsed.content, sessionId: parsed.sessionId }]);
+        return;
+      }
+
+      // If plain text field exists
+      if (parsed.text) {
+        setMessages((prev) => [...prev, { sender: parsed.sender === 'user' ? 'user' : 'bot', text: parsed.text, sessionId: parsed.sessionId }]);
+        return;
+      }
+
+      // Fallback: if object has a 'content' field, treat as markdown
+      if (parsed.content) {
+        setMessages((prev) => [...prev, { sender: parsed.sender === 'user' ? 'user' : 'bot', markdown: String(parsed.content), sessionId: parsed.sessionId }]);
+        return;
+      }
+
+      // Unknown shape - push as textified JSON for debugging
+      setMessages((prev) => [...prev, { sender: 'bot', text: JSON.stringify(parsed) }]);
     };
+
+    ws.current.onopen = () => {
+      console.log('WebSocket connected');
+    };
+    ws.current.onclose = () => {
+      console.log('WebSocket closed');
+    };
+    ws.current.onerror = (ev) => {
+      console.warn('WebSocket error', ev);
+    };
+
     return () => {
       ws.current?.close();
     };
@@ -23,7 +83,7 @@ const ChatWithBot: React.FC = () => {
 
   const sendMessage = () => {
     if (input.trim() && ws.current?.readyState === 1) {
-      const msg = {
+      const msg: ChatMessage = {
         text: input,
         sender: 'user',
         sessionId: sessionId.current,
@@ -43,11 +103,19 @@ const ChatWithBot: React.FC = () => {
             key={idx}
             className={msg.sender === 'user' ? 'chat-message user-message' : 'chat-message bot-message'}
           >
-            <span className="chat-sender">{msg.sender === 'user' ? 'You' : 'Bot'}:</span> {msg.text}
+            <span className="chat-sender">{msg.sender === 'user' ? 'You' : 'Bot'}:</span>
+            <div style={{ marginTop: 6 }}>
+              {msg.markdown ? (
+                <Markdown>{msg.markdown}</Markdown>
+              ) : (
+                <Markdown>{msg.text}</Markdown>
+                // <span>{msg.text}</span>
+              )}
+            </div>
           </div>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8, width: '100%', marginTop: 12 }}>
         <input
           value={input}
           onChange={e => setInput(e.target.value)}

@@ -47,8 +47,9 @@ async def create_graph(*sessions):
     agent_workflow = (
         StateGraph(State)
 
-        .add_node("tool_node", ToolNode(tools=tools))
         .add_node("chat_node", chat_node)
+        .add_node("tool_node", ToolNode(tools=tools))
+
         .add_edge(START, 'chat_node')
 
         .add_conditional_edges(
