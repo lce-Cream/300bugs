@@ -18,6 +18,7 @@ const ChatWithBot: React.FC = () => {
   const [input, setInput] = useState('');
   const ws = useRef<WebSocket | null>(null);
   const sessionId = useRef<string>(generateSessionId());
+  const [expandedImage, setExpandedImage] = useState<{src: string, mime: string} | null>(null);
 
   useEffect(() => {
     ws.current = new WebSocket('ws://localhost:8000/ws/chat');
@@ -126,9 +127,10 @@ const ChatWithBot: React.FC = () => {
             <div style={{ marginTop: 6 }}>
               {msg.image ? (
                 <img
-                  src={`data:image/png;base64,${msg.image}`}
-                  // alt="chat image"
-                  // style={{maxWidth:'300px',borderRadius:8}}
+                  src={`data:${(msg as any).mime || 'image/png'};base64,${msg.image}`}
+                  alt="chat image"
+                  style={{maxWidth:'300px',borderRadius:8,cursor:'pointer'}}
+                  onClick={() => setExpandedImage({src: `data:${(msg as any).mime || 'image/png'};base64,${msg.image}`, mime: (msg as any).mime || 'image/png'})}
                 />
               ) : msg.markdown ? (
                 <Markdown>{msg.markdown}</Markdown>
@@ -148,6 +150,31 @@ const ChatWithBot: React.FC = () => {
         />
         <button onClick={sendMessage}>Send</button>
       </div>
+
+      {expandedImage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
+          onClick={() => setExpandedImage(null)}
+        >
+          <img
+            src={expandedImage.src}
+            alt="Expanded chat image"
+            style={{maxWidth:'90vw',maxHeight:'90vh',borderRadius:12,boxShadow:'0 0 24px #000'}}
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 };
